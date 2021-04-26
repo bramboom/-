@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(some_project LANGUAGES CXX)
+project(GraphDecimator LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -10,40 +10,27 @@ set(CMAKE_AUTORCC ON)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_FLAGS "-o3")
 
-# QtCreator supports the following variables for Android, which are identical to qmake Android variables.
-# Check http://doc.qt.io/qt-5/deployment-android.html for more information.
-# They need to be set before the find_package(Qt5 ...) call.
-
-#if(ANDROID)
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
-#    if (ANDROID_ABI STREQUAL "armeabi-v7a")
-#        set(ANDROID_EXTRA_LIBS
-#            ${CMAKE_CURRENT_SOURCE_DIR}/path/to/libcrypto.so
-#            ${CMAKE_CURRENT_SOURCE_DIR}/path/to/libssl.so)
-#    endif()
-#endif()
-
+set(LINKED_FILES
+    mainwindow.cpp
+    mainwindow.h
+    mainwindow.ui
+    qcustomplot.cpp
+    qcustomplot.h
+)
 find_package(Qt5 COMPONENTS Widgets PrintSupport REQUIRED)
 
 if(ANDROID)
-  add_library(some_project SHARED
+  add_library(GraphDecimator SHARED
     main.cpp
-    mainwindow.cpp
-    mainwindow.h
-    mainwindow.ui
-    qcustomplot.h
-    qcustomplot.cpp
+    ${LINKED_FILES}
   )
 else()
-  add_executable(some_project
+  add_executable(GraphDecimator
     main.cpp
-    mainwindow.cpp
-    mainwindow.h
-    mainwindow.ui
-    qcustomplot.h
-    qcustomplot.cpp
+    ${LINKED_FILES}
   )
 endif()
 
-target_link_libraries(some_project PRIVATE Qt5::Widgets Qt5::PrintSupport)
+target_link_libraries(GraphDecimator PRIVATE Qt5::Widgets Qt5::PrintSupport)
