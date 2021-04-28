@@ -105,7 +105,17 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     ui->lineEditPath->setText("../GraphDecimator/Data1.txt");
-    ui->plotFirst->addGraph(0);
+    filename_edit = ui->lineEditPath;
+    plot.append(get_dtdg_with_size(640, 320));
+    plot.back()->setMouseTracking(true);
+    ui->plotFirst = plot[0];
+    ui->plotFirst->replot();
+    plot.append(get_dtdg_with_size(640, 320));
+    ui->plotSecond = plot[1];
+    ui->plotSecond->replot();
+    dateTime_edit = new QDateTimeEdit;
+    dateTime_edit->setDate(ui->dateEdit->date());
+    dateTime_edit->setTime(ui->timeEdit->time());
     connect(ui->setPathButton, &QPushButton::clicked, this, &MainWindow::set_filename_clicked);
     connect(ui->closeButton, &QPushButton::clicked, this, &MainWindow::close);
     connect(ui->plusButton, &QPushButton::pressed, this, &MainWindow::scale_x);
@@ -161,5 +171,6 @@ void MainWindow::work()
 
 void MainWindow::jjjj(int i)
 {
-    label[i]->setText(QString::number(timer(redraw_by_storage, plot[i], 0, storage)));
+    //label[i]->setText(QString::number(timer(redraw_by_storage, plot[i], 0, storage)));
+    redraw_by_storage(plot[i], 0, storage);
 }

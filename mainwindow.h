@@ -58,7 +58,7 @@ public slots:
         else {
             dateTime_edit->setMinimumDateTime(storage.front().first);
             dateTime_edit->setMaximumDateTime(storage.back().first);
-            //work();
+            work();
         }
     }
     void scale_x()
