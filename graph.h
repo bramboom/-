@@ -27,13 +27,17 @@ public:
     QSharedPointer<QCPGraphDataContainer> storage   { new QCPGraphDataContainer };
     const QVector<AlgorithmComboBoxEl>*   comboBoxEl      { nullptr };
     QCustomPlot*    qcp             { new QCustomPlot };
-    QLabel*         nData           { new QLabel("Data count:") };
-    QLabel*         replotingTime   { new QLabel("Replot time:") };
+    QLabel*         nData           { new QLabel() };
+    QLabel*         replotingTime   { new QLabel() };
+    QLabel*         lbnData           { new QLabel("Data count:") };
+    QLabel*         lbreplotingTime   { new QLabel("Replot time:") };
     QComboBox*      comboBoxAlg     { new QComboBox };
+    QPushButton*    btnDeleteGraph  { new QPushButton("Delete graph")};
     size_t          currentAlg      { 0 };
     QCPRange        xRange          { };
     QCPRange        yRange          { };
 
 public slots:
     void currentAlgChanged(int index);
+    void deleteGraph();
 };

@@ -8,8 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    grid->addWidget(new QLabel("test"), gridRow++, 0);
-    //ui->scrollArea->setLayout(grid);
+    grid->addWidget(plot, gridRow++, 0);
     auto widget = new QWidget;
     widget->setLayout(grid);
     ui->scrollArea->setWidget(widget);
@@ -51,18 +50,19 @@ void MainWindow::addGraph()
     QSharedPointer<Graph> newGraph { new Graph };
     newGraph->qcp->addGraph();
     newGraph->qcp->xAxis->setTicker(QSharedPointer<QCPAxisTickerDateTime>(new QCPAxisTickerDateTime));
-    newGraph->qcp->setMinimumSize(600,200);
-    //newGraph->qcp->setMaximumSize(200,200);
+    newGraph->qcp->setMinimumSize(600,300);
     newGraph->setField(comboBoxAlg);
     --gridRow;
     grid->addWidget(newGraph->qcp, gridRow++, 0, graphSize.height(), graphSize.width());
-    grid->addWidget(new QLabel("Replot time: "), gridRow, graphSize.width());
+    grid->addWidget(newGraph->lbreplotingTime, gridRow, graphSize.width());
     grid->addWidget(newGraph->replotingTime, gridRow++, graphSize.width() + 1, 1, 2);
-    grid->addWidget(new QLabel("Data count: "), gridRow, graphSize.width());
+    grid->addWidget(newGraph->lbnData, gridRow, graphSize.width());
     grid->addWidget(newGraph->nData, gridRow++, graphSize.width() + 1, 1, 2);
     grid->addWidget(newGraph->comboBoxAlg, gridRow, graphSize.width());
+    grid->addWidget(newGraph->btnDeleteGraph, gridRow, graphSize.width() + 0, 2, 1);
     gridRow += graphSize.height();
     graphField.push_back(newGraph);
+    plot->setMaximumSize(1,1);
 }
 
 void MainWindow::btnPathClicked(bool checked)

@@ -29,6 +29,7 @@ private:
     Ui::MainWindow* ui;
     QSize graphSize {10, 6};
     size_t gridRow;
+    QCustomPlot* plot = new QCustomPlot;
 
     QVector<QSharedPointer<Graph>> graphField;
     QVector<AlgorithmComboBoxEl> comboBoxAlg {
@@ -38,7 +39,7 @@ private:
     storage_t storage { new storage_t::value_type };
     QSharedPointer<QLineEdit> lePath { new QLineEdit("../Data1.txt") };
     QSharedPointer<QPushButton> btnPath { new QPushButton("Set Path") };
-    QSharedPointer<QPushButton> btnAddGraph { new QPushButton("Add Graph") };
+    QSharedPointer<QPushButton> btnDeleteGraph { new QPushButton("Delete Graph") };
     void addGraph();
 
 public slots:

@@ -4,14 +4,18 @@ Graph::Graph()
     : QObject(nullptr)
 {
     connect(comboBoxAlg, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Graph::currentAlgChanged);
+    connect(btnDeleteGraph, &QPushButton::clicked, this, &Graph::deleteGraph);
 }
 
 Graph::~Graph()
 {
     delete qcp;
     delete nData;
+    delete lbnData;
+    delete lbreplotingTime;
     delete replotingTime;
     delete comboBoxAlg;
+    delete btnDeleteGraph;
 }
 
 void Graph::setField(const QVector<AlgorithmComboBoxEl> &el)
@@ -73,4 +77,8 @@ void Graph::currentAlgChanged(int index)
     replot(0);
 }
 
+void Graph::deleteGraph()
+{
+    this->~Graph();
+}
 
