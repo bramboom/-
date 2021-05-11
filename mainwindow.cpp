@@ -58,6 +58,8 @@ void MainWindow::addGraph()
     grid->addWidget(newGraph->replotingTime, gridRow++, graphSize.width() + 1, 1, 2);
     grid->addWidget(newGraph->lbnData, gridRow, graphSize.width());
     grid->addWidget(newGraph->nData, gridRow++, graphSize.width() + 1, 1, 2);
+    grid->addWidget(newGraph->dteStart, gridRow, graphSize.width(), 1, 2);
+    grid->addWidget(newGraph->dteEnd, gridRow++, graphSize.width() + 2, 1, 2);
     grid->addWidget(newGraph->comboBoxAlg, gridRow, graphSize.width());
     grid->addWidget(newGraph->btnDeleteGraph, gridRow, graphSize.width() + 0, 2, 1);
     gridRow += graphSize.height();
@@ -78,6 +80,8 @@ void MainWindow::btnPathClicked(bool checked)
 void MainWindow::btnAddGraphClicked(bool checked)
 {
     addGraph();
-    graphField.back()->replot(0, storage);
+    auto graph = graphField.back();
+    graph->setStorage(storage);
+    graph->replot(0);
 }
 

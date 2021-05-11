@@ -23,14 +23,17 @@ public:
     void replot(int id = 0);
     void replot(int id, const QSharedPointer<QCPGraphDataContainer>& data);
     void replot(int id, const QSharedPointer<QCPGraphDataContainer>& data, const QCPRange& range);
+    void setStorage(const QSharedPointer<QCPGraphDataContainer>& data);
 
     QSharedPointer<QCPGraphDataContainer> storage   { new QCPGraphDataContainer };
     const QVector<AlgorithmComboBoxEl>*   comboBoxEl      { nullptr };
     QCustomPlot*    qcp             { new QCustomPlot };
+    QDateTimeEdit*  dteStart        { new QDateTimeEdit};
+    QDateTimeEdit*  dteEnd          { new QDateTimeEdit};
     QLabel*         nData           { new QLabel() };
     QLabel*         replotingTime   { new QLabel() };
-    QLabel*         lbnData           { new QLabel("Data count:") };
-    QLabel*         lbreplotingTime   { new QLabel("Replot time:") };
+    QLabel*         lbnData         { new QLabel("Data count:") };
+    QLabel*         lbreplotingTime { new QLabel("Replot time:") };
     QComboBox*      comboBoxAlg     { new QComboBox };
     QPushButton*    btnDeleteGraph  { new QPushButton("Delete graph")};
     size_t          currentAlg      { 0 };
@@ -39,5 +42,6 @@ public:
 
 public slots:
     void currentAlgChanged(int index);
+    void dateChanged(const QDateTime& dateTime);
     void deleteGraph();
 };

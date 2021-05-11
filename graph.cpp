@@ -5,6 +5,11 @@ Graph::Graph()
 {
     connect(comboBoxAlg, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Graph::currentAlgChanged);
     connect(btnDeleteGraph, &QPushButton::clicked, this, &Graph::deleteGraph);
+
+    dteEnd->setCalendarPopup(true);
+    dteStart->setCalendarPopup(true);
+    connect(dteStart, &QDateTimeEdit::dateTimeChanged, this, &Graph::dateChanged);
+    connect(dteEnd, &QDateTimeEdit::dateTimeChanged, this, &Graph::dateChanged);
 }
 
 Graph::~Graph()
@@ -16,6 +21,8 @@ Graph::~Graph()
     delete replotingTime;
     delete comboBoxAlg;
     delete btnDeleteGraph;
+    delete dteEnd;
+    delete dteStart;
 }
 
 void Graph::setField(const QVector<AlgorithmComboBoxEl> &el)
@@ -48,6 +55,11 @@ void Graph::replot(int id)
         xRange.upper = std::max(xr.upper, xRange.upper);
         yRange.lower = std::max(yr.lower, yRange.lower);
         yRange.upper = std::max(yr.upper, yRange.upper);
+        auto lower = QDateTime::fromTime_t(xRange.lower);
+        auto upper = QDateTime::fromTime_t(xRange.upper);
+        dteStart->setDateTimeRange(lower, upper);
+        dteEnd->setDateTimeRange(lower, upper);
+        dteEnd->setDateTime(upper);
     }
     qcp->xAxis->setRange(xRange);
     qcp->yAxis->setRange(yRange);
@@ -58,8 +70,27 @@ void Graph::replot(int id)
 
 void Graph::replot(int id, const QSharedPointer<QCPGraphDataContainer>& data)
 {
-    qcp->graph(id)->setData(data);
-    replot(id);
+    QTime timer;
+    timer.start();
+    auto graph = qcp->graph(id);
+    bool xEx, yEx;
+    auto yr = data->valueRange(yEx);
+    graph->setData((*comboBoxEl)[currentAlg].function(data, (yr.upper - yr.lower) / 30));
+    auto xr = data->keyRange(xEx);
+    if(!xEx || !yEx) {
+        graph->data()->clear();
+    }
+    else {
+        xRange = xr;
+        yRange = yr;
+        auto lower = QDateTime::fromTime_t(xRange.lower);
+        auto upper = QDateTime::fromTime_t(xRange.upper);
+    }
+    qcp->xAxis->setRange(xRange);
+    qcp->yAxis->setRange(yRange);
+    qcp->replot();
+    replotingTime->setText(QString::number(timer.elapsed()) + "ms");
+    nData->setText(QString::number(graph->data()->size()));
 }
 
 void Graph::replot(int id, const QSharedPointer<QCPGraphDataContainer>& data, const QCPRange& range)
@@ -71,6 +102,11 @@ void Graph::replot(int id, const QSharedPointer<QCPGraphDataContainer>& data, co
     replot(id);
 }
 
+void Graph::setStorage(const QSharedPointer<QCPGraphDataContainer>& data)
+{
+    storage = QSharedPointer<QCPGraphDataContainer>(new QCPGraphDataContainer(*data));
+}
+
 void Graph::currentAlgChanged(int index)
 {
     currentAlg = index;
@@ -80,5 +116,13 @@ void Graph::currentAlgChanged(int index)
 void Graph::deleteGraph()
 {
     this->~Graph();
+}
+
+void Graph::dateChanged(const QDateTime& dateTime)
+{
+    auto s2 = QSharedPointer<QCPGraphDataContainer>(new QCPGraphDataContainer(*storage));
+    s2->removeBefore(static_cast<double>(dteStart->dateTime().toTime_t()));
+    s2->removeAfter(static_cast<double>(dteEnd->dateTime().toTime_t()));
+    replot(0, s2);
 }
 

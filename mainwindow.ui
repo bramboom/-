@@ -15,7 +15,71 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0" colspan="7">
+    <item row="4" column="0" colspan="4">
+     <spacer name="horizontalSpacer_3">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>600</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="2" column="0" colspan="2">
+     <widget class="QLineEdit" name="lePath">
+      <property name="minimumSize">
+       <size>
+        <width>221</width>
+        <height>25</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>221</width>
+        <height>25</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>../Data1.txt</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="4" colspan="2">
+     <widget class="QPushButton" name="btnAddGraph">
+      <property name="minimumSize">
+       <size>
+        <width>170</width>
+        <height>25</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>170</width>
+        <height>25</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>AddGraph</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0" colspan="4">
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>600</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="0" column="0" colspan="6">
      <widget class="QScrollArea" name="scrollArea">
       <property name="minimumSize">
        <size>
@@ -38,205 +102,13 @@
          <x>0</x>
          <y>0</y>
          <width>780</width>
-         <height>477</height>
+         <height>478</height>
         </rect>
        </property>
       </widget>
      </widget>
     </item>
-    <item row="1" column="0" colspan="5">
-     <spacer name="horizontalSpacer">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>600</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="1" column="5" colspan="2">
-     <widget class="QPushButton" name="btnAddGraph">
-      <property name="minimumSize">
-       <size>
-        <width>170</width>
-        <height>25</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>170</width>
-        <height>25</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>AddGraph</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0" colspan="3">
-     <widget class="QLineEdit" name="lePath">
-      <property name="minimumSize">
-       <size>
-        <width>221</width>
-        <height>25</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>221</width>
-        <height>25</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>../Data1.txt</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="3">
-     <widget class="QPushButton" name="btnSetPath">
-      <property name="minimumSize">
-       <size>
-        <width>160</width>
-        <height>25</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>160</width>
-        <height>25</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>SetPath</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="4">
-     <spacer name="horizontalSpacer_2">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>204</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="2" column="5">
-     <widget class="QLabel" name="lbRdTmName">
-      <property name="minimumSize">
-       <size>
-        <width>100</width>
-        <height>17</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>100</width>
-        <height>17</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>Reading time:</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="6">
-     <widget class="QLabel" name="lbRdTm">
-      <property name="minimumSize">
-       <size>
-        <width>67</width>
-        <height>17</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>67</width>
-        <height>17</height>
-       </size>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0">
-     <widget class="QLabel" name="lbDt">
-      <property name="minimumSize">
-       <size>
-        <width>40</width>
-        <height>17</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>40</width>
-        <height>17</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>Date:</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="1">
-     <widget class="QDateTimeEdit" name="dtTmIn">
-      <property name="minimumSize">
-       <size>
-        <width>160</width>
-        <height>26</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>160</width>
-        <height>26</height>
-       </size>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="2">
-     <widget class="QLabel" name="lbSpace">
-      <property name="text">
-       <string> - </string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="3">
-     <widget class="QDateTimeEdit" name="dtTmOut">
-      <property name="minimumSize">
-       <size>
-        <width>160</width>
-        <height>26</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>160</width>
-        <height>26</height>
-       </size>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="4">
-     <spacer name="horizontalSpacer_4">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>204</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="3" column="5" colspan="2">
+    <item row="3" column="4" colspan="2">
      <widget class="QPushButton" name="btnSetDate">
       <property name="minimumSize">
        <size>
@@ -255,20 +127,45 @@
       </property>
      </widget>
     </item>
-    <item row="4" column="0" colspan="5">
-     <spacer name="horizontalSpacer_3">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
+    <item row="2" column="5">
+     <widget class="QLabel" name="lbRdTm">
+      <property name="minimumSize">
        <size>
-        <width>600</width>
-        <height>20</height>
+        <width>67</width>
+        <height>17</height>
        </size>
       </property>
-     </spacer>
+      <property name="maximumSize">
+       <size>
+        <width>67</width>
+        <height>17</height>
+       </size>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
     </item>
-    <item row="4" column="5" colspan="2">
+    <item row="2" column="2">
+     <widget class="QPushButton" name="btnSetPath">
+      <property name="minimumSize">
+       <size>
+        <width>160</width>
+        <height>25</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>160</width>
+        <height>25</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>SetPath</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="4" colspan="2">
      <widget class="QPushButton" name="btnClose">
       <property name="minimumSize">
        <size>
@@ -286,6 +183,51 @@
        <string>Close</string>
       </property>
      </widget>
+    </item>
+    <item row="2" column="3">
+     <spacer name="horizontalSpacer_2">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>204</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="2" column="4">
+     <widget class="QLabel" name="lbRdTmName">
+      <property name="minimumSize">
+       <size>
+        <width>100</width>
+        <height>17</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>100</width>
+        <height>17</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>Reading time:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0" colspan="4">
+     <spacer name="horizontalSpacer_4">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>204</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
     </item>
    </layout>
   </widget>
