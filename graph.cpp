@@ -3,126 +3,145 @@
 Graph::Graph()
     : QObject(nullptr)
 {
-    connect(comboBoxAlg, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Graph::currentAlgChanged);
-    connect(btnDeleteGraph, &QPushButton::clicked, this, &Graph::deleteGraph);
-
-    dteEnd->setCalendarPopup(true);
-    dteStart->setCalendarPopup(true);
-    connect(dteStart, &QDateTimeEdit::dateTimeChanged, this, &Graph::dateChanged);
-    connect(dteEnd, &QDateTimeEdit::dateTimeChanged, this, &Graph::dateChanged);
+    connect(m_cbAlgorithm,  QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Graph::currentAlgChanged);
+    connect(m_buttonClose,  &QPushButton::clicked, this, &Graph::btnCloseClicked);
+    connect(m_dteStart,     &QDateTimeEdit::dateTimeChanged, this, &Graph::dteStartChanged);
+    connect(m_dteEnd,       &QDateTimeEdit::dateTimeChanged, this, &Graph::dteEndChanged);
+    m_buttonClose->setMinimumSize(25, 25);
+    m_buttonClose->setMaximumSize(25, 25);
+    m_dteEnd->setMaximumWidth(180);
+    m_dteStart->setMaximumWidth(180);
+    m_dteEnd->setMinimumWidth(180);
+    m_dteStart->setMinimumWidth(180);
+    m_customPlot->setMinimumHeight(300);
+    m_dteStart->setCalendarPopup(true);
+    m_dteEnd->setCalendarPopup(true);
+    m_grid->addWidget(m_customPlot,  0, 0, 8, 15 );
+    m_grid->addWidget(m_buttonClose, 0, 18 );
+    m_grid->addWidget(m_lReplotTime, 2, 15, 1, 2 );
+    m_grid->addWidget(m_nData,       3, 15, 1, 2 );
+    m_grid->addWidget(m_dteStart,    4, 15, 1, 2 );
+    m_grid->addWidget(m_dteEnd,      4, 17, 1, 2 );
+    m_grid->addWidget(m_cbAlgorithm, 5, 15 );
+    m_widget->setLayout(m_grid);
 }
 
 Graph::~Graph()
 {
-    delete qcp;
-    delete nData;
-    delete lbnData;
-    delete lbreplotingTime;
-    delete replotingTime;
-    delete comboBoxAlg;
-    delete btnDeleteGraph;
-    delete dteEnd;
-    delete dteStart;
+    delete m_cbAlgorithm;
+    delete m_lReplotTime;
+    delete m_nData;
+    delete m_dteEnd;
+    delete m_dteStart;
+    delete m_customPlot;
+    delete m_buttonClose;
+    delete m_grid;
+    delete m_widget;
 }
+
 
 void Graph::setField(const QVector<AlgorithmComboBoxEl> &el)
 {
     comboBoxEl = &el;
     for(const auto& x : *comboBoxEl) {
-        comboBoxAlg->addItem(x.text);
+        m_cbAlgorithm->addItem(x.text);
     }
 }
 
 void Graph::replot(int id)
 {
-    if(!comboBoxEl || currentAlg >= comboBoxEl->size()) {
-        messageBox("lol");
+    if(!comboBoxEl || m_algIndex >= comboBoxEl->size()) {
         return;
     }
-    QTime timer;
-    timer.start();
-    auto graph = qcp->graph(id);
+    auto graph = m_customPlot->graph(id);
     bool xEx, yEx;
-    auto yr = graph->data()->valueRange(yEx);
-    graph->setData((*comboBoxEl)[currentAlg].function(graph->data(), (yr.upper - yr.lower) / 30));
-    auto xr = graph->data()->keyRange(xEx);
-    yr = graph->data()->valueRange(yEx);
-    if(!xEx || !yEx) {
-        graph->data()->clear();
-    }
-    else {
-        xRange.lower = std::max(xr.lower, xRange.lower);
-        xRange.upper = std::max(xr.upper, xRange.upper);
-        yRange.lower = std::max(yr.lower, yRange.lower);
-        yRange.upper = std::max(yr.upper, yRange.upper);
-        auto lower = QDateTime::fromTime_t(xRange.lower);
-        auto upper = QDateTime::fromTime_t(xRange.upper);
-        dteStart->setDateTimeRange(lower, upper);
-        dteEnd->setDateTimeRange(lower, upper);
-        dteEnd->setDateTime(upper);
-    }
-    qcp->xAxis->setRange(xRange);
-    qcp->yAxis->setRange(yRange);
-    qcp->replot();
-    replotingTime->setText(QString::number(timer.elapsed()) + "ms");
-    nData->setText(QString::number(graph->data()->size()));
-}
-
-void Graph::replot(int id, const QSharedPointer<QCPGraphDataContainer>& data)
-{
-    QTime timer;
-    timer.start();
-    auto graph = qcp->graph(id);
-    bool xEx, yEx;
-    auto yr = data->valueRange(yEx);
-    graph->setData((*comboBoxEl)[currentAlg].function(data, (yr.upper - yr.lower) / 30));
-    auto xr = data->keyRange(xEx);
+    auto yr = m_storage->valueRange(yEx);
+    auto xr = m_storage->keyRange(xEx);
     if(!xEx || !yEx) {
         graph->data()->clear();
     }
     else {
         xRange = xr;
         yRange = yr;
+        auto alg = (*comboBoxEl)[m_algIndex];
+        graph->setData(alg.function(m_storage, alg.kFunc(xRange, yRange)));
         auto lower = QDateTime::fromTime_t(xRange.lower);
         auto upper = QDateTime::fromTime_t(xRange.upper);
+        m_dteStart->setDateTimeRange(lower, upper);
+        m_dteEnd->setDateTimeRange(lower, upper);
+        m_dteStart->setDateTime(lower);
+        m_dteEnd->setDateTime(upper);
     }
-    qcp->xAxis->setRange(xRange);
-    qcp->yAxis->setRange(yRange);
-    qcp->replot();
-    replotingTime->setText(QString::number(timer.elapsed()) + "ms");
-    nData->setText(QString::number(graph->data()->size()));
+    QTime timer;
+    timer.start();
+    m_customPlot->xAxis->setRange(xRange);
+    m_customPlot->yAxis->setRange(yRange);
+    m_customPlot->replot();
+    m_lReplotTime->setText("Replot time:\t" + QString::number(timer.elapsed()) + "ms");
+    m_nData->setText("Data count:\t" + QString::number(graph->data()->size()));
 }
 
-void Graph::replot(int id, const QSharedPointer<QCPGraphDataContainer>& data, const QCPRange& range)
+void Graph::replot(int id, const storage_t& data)
 {
-    auto graph = qcp->graph(id);
-    graph->setData(QSharedPointer<QCPGraphDataContainer>(new QCPGraphDataContainer(*data)));
-    graph->data()->removeBefore(range.lower);
-    graph->data()->removeAfter(range.upper);
-    replot(id);
+    if(!comboBoxEl || m_algIndex >= comboBoxEl->size()) {
+        return;
+    }
+    auto graph = m_customPlot->graph(id);
+    bool xEx, yEx;
+    auto yr = data->valueRange(yEx);
+    auto xr = data->keyRange(xEx);
+    if(!xEx || !yEx) {
+        graph->data()->clear();
+    }
+    else {
+        xRange.expand(xr);
+        yRange.expand(yr);
+        auto alg = (*comboBoxEl)[m_algIndex];
+        graph->setData(alg.function(data, alg.kFunc(xRange, yRange)));
+    }
+    QTime timer;
+    timer.start();
+    m_customPlot->xAxis->setRange(xr);
+    m_customPlot->yAxis->setRange(yr);
+    m_customPlot->replot();
+    m_lReplotTime->setText("Replot time:\t" + QString::number(timer.elapsed()) + "ms");
+    m_nData->setText("Data count:\t" + QString::number(graph->data()->size()));
 }
 
-void Graph::setStorage(const QSharedPointer<QCPGraphDataContainer>& data)
+void Graph::setStorage(const storage_t& data)
 {
-    storage = QSharedPointer<QCPGraphDataContainer>(new QCPGraphDataContainer(*data));
+    m_storage = data;
 }
+
+//                  Slots
 
 void Graph::currentAlgChanged(int index)
 {
-    currentAlg = index;
+    m_algIndex = index;
     replot(0);
 }
 
-void Graph::deleteGraph()
+void Graph::dteStartChanged(const QDateTime& dateTime)
 {
-    this->~Graph();
+    auto s2 = storage_t(new storage_t::value_type(*m_storage));
+    s2->removeBefore(static_cast<double>(m_dteStart->dateTime().toTime_t()));
+    s2->removeAfter(static_cast<double>(m_dteEnd->dateTime().toTime_t()));
+    m_dteEnd->setMinimumDateTime(m_dteStart->dateTime());
+    replot(0, s2);
 }
 
-void Graph::dateChanged(const QDateTime& dateTime)
+void Graph::dteEndChanged(const QDateTime& dateTime)
 {
-    auto s2 = QSharedPointer<QCPGraphDataContainer>(new QCPGraphDataContainer(*storage));
-    s2->removeBefore(static_cast<double>(dteStart->dateTime().toTime_t()));
-    s2->removeAfter(static_cast<double>(dteEnd->dateTime().toTime_t()));
+    auto s2 = storage_t(new storage_t::value_type(*m_storage));
+    s2->removeBefore(static_cast<double>(m_dteStart->dateTime().toTime_t()));
+    s2->removeAfter(static_cast<double>(m_dteEnd->dateTime().toTime_t()));
+    m_dteStart->setMaximumDateTime(m_dteEnd->dateTime());
     replot(0, s2);
+}
+
+void Graph::btnCloseClicked(bool checked)
+{
+    emit close(this);
+    this->~Graph();
 }
 
