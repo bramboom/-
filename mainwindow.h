@@ -1,72 +1,91 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
-
+#pragma once
 #include <QMainWindow>
-
-#include <QMessageBox>
-#include <QLineEdit>
-#include <qcustomplot.h>
-#include <QDateTimeEdit>
-
-template<typename Tp>
-using Pair = QPair<Tp, Tp>;
-
-using storage_t = QVector<QPair<QDateTime, double>>;
-
-void debug(const QString& str);
-bool read_from_file(const QString&, storage_t&);
+#include <QWidget>
+#include "datadecimator.h"
+#include "graph.h"
+#include "quabrowser.h"
+#include "qfilepathwidget.h"
+#include <opcuaclient/UaHistory.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
-
-template <typename Func, typename... Args>
-int timer(Func&& f, Args&&... args)
-{
-    QTime timer;
-    timer.start();
-    f(args...);
-    return timer.elapsed();
-}
-
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+public:
+    using storage_t = QSharedPointer<QCPGraphDataContainer>;
+private:
+    EleSyOpcUaClient::UaConnection::Ptr connection;
+    EleSyOpcUaClient::UaHistory::Ptr    history;
 
+private:
+    Ui::MainWindow* ui;
+    QWidget*        cw          { new QWidget };
+    QGridLayout*    grid        { new QGridLayout };
+    QSize           graphSize   {10, 6};
+    size_t          gridRow     { };
+    QList<Graph*>   graphField  { };
+    QVector<storage_t>*       storage { new QVector<storage_t> };
+    QMenu*          source      { new QMenu("source")};
+    QPushButton*    btnSetPathFile   { new QPushButton()};
+    QLineEdit*      lePath           { new QLineEdit()};
+    QWidget*        widget           { new QWidget};
+    QLabel*         lblPath          { new QLabel};
+    QVector<AlgorithmComboBoxEl> comboBoxAlg {
+        {
+            [](const storage_t& data, double sv) { return storage_t{ new storage_t::value_type(*data) }; },
+            " None" ,
+            [](const QCPRange& xRange, const QCPRange& yRange) { return 0; }
+        },
+        {
+            DataDecimator::douglas_peucker,
+            "Douglas-Peucker",
+            [](const QCPRange& xRange, const QCPRange& yRange) { return std::pow(yRange.upper - yRange.lower, 1 / 6); }
+        },
+        {
+            DataDecimator::reumann_witkam,
+            "Reumann-Witkam",
+            [](const QCPRange& xRange, const QCPRange& yRange) { return (yRange.upper - yRange.lower) / 30.0; }
+        },
+        {
+            DataDecimator::largest_triangle,
+            "Largest triangle",
+            [](const QCPRange& xRange, const QCPRange& yRange) { return xRange.upper - xRange.lower; }
+        },
+        {
+            DataDecimator::longest_line,
+            "Longest line",
+            [](const QCPRange& xRange, const QCPRange& yRange) { return xRange.upper - xRange.lower; }
+        },
+        {
+            DataDecimator::opheim,
+            "Opheim",
+            [](const QCPRange& xRange, const QCPRange& yRange) { return (xRange.upper - xRange.lower) / 700; }
+        },
+        {
+            DataDecimator::lang,
+            "Lang",
+            [](const QCPRange& xRange, const QCPRange& yRange) { return (yRange.upper - yRange.lower) / 40.0;}
+        }
+    };
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void work();
-    void jjjj(int);
 
-private:
-    Ui::MainWindow *ui;
-    storage_t storage;
-    QLineEdit* filename_edit;
-    QVector<QCustomPlot*> plot;
-    QVector<QLabel*> label;
-    QDateTimeEdit* dateTime_edit;
+    bool read_from_file(const QString& path);
+    void addGraph();
+    storage_t readFromServer(const QString &nodeId, const QDateTime& start, const QDateTime& end);
 
 public slots:
-    void set_filename_clicked(bool checked)
-    {
-        if(!read_from_file(filename_edit->text(), storage)) {
-            debug("This file does not exists\nfu");
-        }
-        else {
-            dateTime_edit->setMinimumDateTime(storage.front().first);
-            dateTime_edit->setMaximumDateTime(storage.back().first);
-            work();
-        }
-    }
-    void scale_x()
-    {
-        int scalek = 10000;
-        auto r = plot.front()->xAxis->range();
-        plot.front()->xAxis->setRange(r.lower + scalek, r.upper - scalek);
-        plot.front()->replot();
-    }
+    void btnSetFileClicked(bool);
+    void btnSetServerClicked(bool);
+
+    void btnAddGraphClicked(bool);
+    void btnCloseGraphClicked(Graph*);
+    void lePathEdited(const QString&);
+    void serverUpdate(const QDateTime &startDateTime, const QDateTime &endDateTime);
+    void inputFilePath(bool);
+    void inputServerPath(bool);
 };
-#endif // MAINWINDOW_H

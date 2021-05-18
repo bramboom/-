@@ -1,176 +1,191 @@
 #include "mainwindow.h"
+#include "qfilepathwidget.h"
 #include "./ui_mainwindow.h"
-#include <QFile>
-#include <QDateTime>
-#include <qcustomplot.h>
-#include <QDateTimeEdit>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QtConcurrent/QtConcurrent>
-
-void debug(const QString& str)
-{
-    QMessageBox mb;
-    mb.setText(str);
-    mb.show();
-    mb.exec();
-}
-
-QCustomPlot* dateTime_double_graph(QWidget* parent = nullptr)
-{
-    auto customPlot = new QCustomPlot(parent);
-    customPlot->xAxis->setTicker(QSharedPointer<QCPAxisTickerDateTime>(new QCPAxisTickerDateTime));
-    return customPlot;
-}
-
-Pair<QCPRange> graph_storage(QCPGraph* graph, const storage_t& storage)
-{
-    double min = std::numeric_limits<double>::max();
-    double max = std::numeric_limits<double>::min();
-    for(const auto& x : storage) {
-        graph->addData(x.first.toTime_t(), x.second);
-        if(x.second > max) {
-            max = x.second;
-        }
-        else if (x.second < min) {
-            min = x.second;
-        }
-    }
-    return Pair<QCPRange>(
-        { static_cast<double>(storage.front().first.toTime_t()), static_cast<double>(storage.back().first.toTime_t()) },
-        { min, max}
-    );
-}
-
-void redraw_by_storage(QCustomPlot* graph, int id, const storage_t& storage)
-{
-    auto ranges = graph_storage(graph->graph(id), storage);
-    graph->xAxis->setRange(ranges.first);
-    graph->yAxis->setRange(ranges.second);
-    graph->replot();
-}
-
-QCustomPlot* get_dtdg_with_size(int w, int h, QWidget* parent = nullptr)
-{
-    auto customPlot = dateTime_double_graph(parent);
-    customPlot->setMinimumSize(w, h);
-    customPlot->addGraph();
-    return customPlot;
-}
-
-
-QLabel* get_label_fixed_width(int w, QWidget* parent = nullptr)
-{
-    auto label = new QLabel(parent);
-    label->setFixedWidth(w);
-    return label;
-}
-
-bool read_from_file(const QString& path, storage_t& storage)
-{
-    QFile file(path);
-    storage.clear();
-    bool res = false;
-    if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        while(!file.atEnd()) {
-            auto line   = file.readLine();
-            int  day    = 10*line[0] + line[1] - 528;
-            int  month  = 10*line[3] + line[4] - 528;
-            int  year   = 1000*line[6] + 100*line[7] + 10*line[8] + line[9] - 53328;
-
-            int  hour;
-            uint index  = 11;
-            if(line[index + 7] == '\t') {
-                hour    = line[index] - 48;
-            }
-            else {
-                hour    = 10*line[index] + line[index + 1] - 528;
-                ++index;
-            }
-            index += 2;
-            int  minute = 10*line[index] + line[index + 1] - 528;
-            index += 3;
-            int  second = 10*line[index] + line[index + 1] - 528;
-            storage.append({ QDateTime(QDate(year, month, day), QTime(hour, minute, second)), line.mid(index + 3).toDouble() });
-        }
-        file.close();
-        res = true;
-    }
-    return res;
-}
+#include <QGridLayout>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->lineEditPath->setText("../GraphDecimator/Data1.txt");
-    filename_edit = ui->lineEditPath;
-    plot.append(get_dtdg_with_size(640, 320));
-    plot.back()->setMouseTracking(true);
-    ui->plotFirst = plot[0];
-    ui->plotFirst->replot();
-    plot.append(get_dtdg_with_size(640, 320));
-    ui->plotSecond = plot[1];
-    ui->plotSecond->replot();
-    dateTime_edit = new QDateTimeEdit;
-    dateTime_edit->setDate(ui->dateEdit->date());
-    dateTime_edit->setTime(ui->timeEdit->time());
-    connect(ui->setPathButton, &QPushButton::clicked, this, &MainWindow::set_filename_clicked);
-    connect(ui->closeButton, &QPushButton::clicked, this, &MainWindow::close);
-    connect(ui->plusButton, &QPushButton::pressed, this, &MainWindow::scale_x);
-    //this->resize(1800, 900);
-/*
-    plot.append(get_dtdg_with_size(640, 320));
-    plot.back()->setMouseTracking(true);
-
-    label.append(get_label_fixed_width(150));
-
-    plot.append(get_dtdg_with_size(640, 320));
-
-    label.append(get_label_fixed_width(150));
-
-    filename_edit   = new QLineEdit("../GraphDecimator/Data1.txt");
-    filename_edit->setMaximumWidth(150);
-    auto set_file_btn = new QPushButton("set file");
-    connect(set_file_btn, &QPushButton::clicked, this, &MainWindow::set_filename_clicked);
-
-    dateTime_edit  = new QDateTimeEdit;
-    dateTime_edit->setMaximumWidth(150);
-
-    auto grid       = new QGridLayout;
-    grid->addWidget(plot[0], 0, 0);
-    grid->addWidget(plot[1], 1, 0);
-    grid->addWidget(label[0], 0, 1);
-    grid->addWidget(label[1], 1, 1);
-    grid->addWidget(filename_edit, 2, 0);
-    grid->addWidget(dateTime_edit, 2, 1);
-    grid->addWidget(set_file_btn, 3, 0);
-
-    auto widget     = new QWidget(this);
+    cw->setLayout(grid);
+    ui->scrollArea->setWidget(cw);
+    QGridLayout* grid = new QGridLayout;
+    grid->addWidget(lblPath, 0, 0);
+    grid->addWidget(lePath, 0, 1, 1, 4);
+    grid->addWidget(btnSetPathFile, 0, 5);
     widget->setLayout(grid);
-
-    this->setCentralWidget(widget);
-    auto plus_ebat = new QPushButton("+");
-    connect(plus_ebat, &QPushButton::pressed, this, &MainWindow::scale_x);
-    grid->addWidget(plus_ebat, 4, 0);*/
+    widget->setMinimumSize(300, 100);
+    connect(btnSetPathFile,     &QPushButton::clicked, this, &MainWindow::btnSetFileClicked);
+    connect(btnSetPathFile,     &QPushButton::clicked, this, &MainWindow::btnSetServerClicked);
+    connect(ui->btnAddGraph,    &QPushButton::clicked, this, &MainWindow::btnAddGraphClicked);
+    connect(ui->btnClose,       &QPushButton::clicked, this, &MainWindow::close);
+    connect(lePath,             &QLineEdit::textEdited, this, &MainWindow::lePathEdited);
+    connect(ui->cwConfiguration, &QUaConfigurationWidget::dateTimeRangeUpdated, this, &MainWindow::serverUpdate);
+    connect(ui->actionFile,     &QAction::triggered, this, &MainWindow::inputFilePath);
+    connect(ui->actionServer,   &QAction::triggered, this, &MainWindow::inputFilePath);
 }
 
 MainWindow::~MainWindow()
 {
+    delete grid;
+    delete cw;
     delete ui;
+    for(auto& graph : graphField) {
+        delete graph;
+    }
 }
 
-void MainWindow::work()
+bool MainWindow::read_from_file(const QString &path)
 {
-    jjjj(0);
-    jjjj(1);
-    //auto f1 = QtConcurrent::run(this, &MainWindow::jjjj, 0);
-    //auto f2 = QtConcurrent::run(this, &MainWindow::jjjj, 1);
+    storage->push_back(storage_t(new storage_t::value_type));
+    FILE* file = fopen(path.toLocal8Bit().data(), "r");
+    if(!file) {
+        return false;
+    }
+    size_t  l;
+    char*   line { nullptr };
+    double  value;
+    while(!feof(file)) {
+        getline(&line, &l, file);
+        struct tm t { };
+        sscanf(line, "%d.%d.%d %d:%d:%d\t%lf", &t.tm_mday, &t.tm_mon, &t.tm_year, &t.tm_hour, &t.tm_min, &t.tm_sec, &value);
+        t.tm_year -= 1900;
+        --t.tm_mon;
+        storage->back()->add({ static_cast<double>(mktime(&t)), value });
+    }
+    return true;
 }
 
-void MainWindow::jjjj(int i)
+void MainWindow::addGraph()
 {
-    //label[i]->setText(QString::number(timer(redraw_by_storage, plot[i], 0, storage)));
-    redraw_by_storage(plot[i], 0, storage);
+    Graph* newGraph { new Graph };
+    newGraph->customPlot()->addGraph();
+    newGraph->customPlot()->xAxis->setTicker(QSharedPointer<QCPAxisTickerDateTime>(new QCPAxisTickerDateTime));
+    newGraph->setField(comboBoxAlg);
+    connect(newGraph, &Graph::close, this, &MainWindow::btnCloseGraphClicked);
+    grid->addWidget(newGraph->widget(), gridRow++, 0, 1, 4);
+    graphField.push_back(newGraph);
 }
+
+MainWindow::storage_t MainWindow::readFromServer(const QString &nodeId, const QDateTime &start, const QDateTime &end)
+{
+    storage_t qcpData { new storage_t::value_type };
+    if(start < end)
+    {
+        using namespace EleSyOpcUaClient;
+        UaBytes cPoint, cPointNext;
+        auto id = nodeId.toStdString();
+        auto data = history->getHistoryRawValues(id, 1000000, UaDateTime(start.toMSecsSinceEpoch() * 1000), UaDateTime(end.toMSecsSinceEpoch() * 1000), false, cPoint);
+        for(const auto& x : data) {
+            qcpData->add(QCPGraphData(x.sourceTimeStamp.toUnixMicrosec() / 1000000, x.val->v_double()));
+        }
+        do {
+            data = history->getNextHistoryRawValues(id, cPoint, cPointNext);
+            for(const auto& x : data) {
+                qcpData->add(QCPGraphData(x.sourceTimeStamp.toUnixMicrosec() / 1000000, x.val->v_double()));
+            }
+            cPoint = cPointNext;
+        } while(!data.empty());
+        history->releasePoint(id, cPoint);
+    }
+    return qcpData;
+}
+
+void MainWindow::btnSetFileClicked(bool checked)
+{
+    storage->clear();
+    QTime timer;
+    timer.start();
+    bool readed = read_from_file(lePath->text());
+    if(!readed)
+    {
+        lePath->setStyleSheet("color: red;");
+    }
+    else
+    {
+        ui->lblRdTm->setText(QString::number(timer.elapsed()) + "ms");
+        widget->close();
+    }
+    for(const auto& x : graphField)
+    {
+        x->setStorage(storage);
+        x->replot(0);
+    }
+}
+
+void MainWindow::btnSetServerClicked(bool checked)
+{
+    //opc.tcp://192.168.56.1:62456
+    using namespace EleSyOpcUaClient;
+    ConnectionParams params;
+    params.serverUrl = lePath->text().toStdString();
+    params.connectionName = "Graph Decimator Connection";
+    UaStatusCode connectionStatus = createConnection(params, true, false, connection);
+    ui->cwServerBrowser->setConnection(connection);
+    UaStatusCode historyStatus = createHistory(connection, history);
+    if(connectionStatus != uaGood || historyStatus != uaGood || !connection->isConnected() || ui->cwServerBrowser->isValid())
+    {
+        lePath->setStyleSheet("color: red;");
+        return;
+    }
+    widget->close();
+}
+
+void MainWindow::btnAddGraphClicked(bool checked)
+{
+    addGraph();
+    auto graph = graphField.back();
+    graph->setStorage(storage);
+    graph->replot(0);
+}
+
+void MainWindow::btnCloseGraphClicked(Graph* graph)
+{
+    graphField.removeOne(graph);
+    grid->removeWidget(graph->widget());
+}
+
+void MainWindow::lePathEdited(const QString &text)
+{
+    lePath->setStyleSheet("color: black");
+}
+
+void MainWindow::serverUpdate(const QDateTime &startDateTime, const QDateTime &endDateTime)
+{
+    //opc.tcp://192.168.56.1:62456
+    storage->clear();
+    for(auto i = 0; i < ui->cwConfiguration->list->count(); ++i)
+    {
+        storage->push_back(readFromServer(ui->cwConfiguration->list->item(i)->text(),startDateTime, endDateTime));
+        messageBox(ui->cwConfiguration->list->item(i)->text() + '\n' + QString::number(storage->at(i)->size()));
+    }
+
+    for(const auto& x : graphField)
+    {
+        x->setStorage(storage);
+        x->replot();
+    }
+}
+
+void MainWindow::inputFilePath(bool cheked)
+{
+    lblPath->setText("Path to file:");
+    btnSetPathFile->setText("Set path from file");
+    connect(btnSetPathFile,    &QPushButton::clicked, this, &MainWindow::btnSetFileClicked);
+    disconnect(btnSetPathFile, &QPushButton::clicked, this, &MainWindow::btnSetServerClicked);
+    widget->setWindowModality(Qt::ApplicationModal);
+    widget->show();
+}
+
+void MainWindow::inputServerPath(bool cheked)
+{
+    lblPath->setText("Server IP");
+    btnSetPathFile->setText("Set path from server");
+    disconnect(btnSetPathFile, &QPushButton::clicked, this, &MainWindow::btnSetFileClicked);
+    connect(btnSetPathFile,    &QPushButton::clicked, this, &MainWindow::btnSetServerClicked);
+    widget->setWindowModality(Qt::ApplicationModal);
+    widget->show();
+}
+
+
