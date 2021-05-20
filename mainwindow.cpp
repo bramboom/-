@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "qfilepathwidget.h"
 #include "./ui_mainwindow.h"
 #include <QGridLayout>
 
@@ -23,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(lePath,             &QLineEdit::textEdited, this, &MainWindow::lePathEdited);
     connect(ui->cwConfiguration, &QUaConfigurationWidget::dateTimeRangeUpdated, this, &MainWindow::serverUpdate);
     connect(ui->actionFile,     &QAction::triggered, this, &MainWindow::inputFilePath);
-    connect(ui->actionServer,   &QAction::triggered, this, &MainWindow::inputFilePath);
+    connect(ui->actionServer,   &QAction::triggered, this, &MainWindow::inputServerPath);
 }
 
 MainWindow::~MainWindow()
