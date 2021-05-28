@@ -208,6 +208,7 @@ void MainWindow::changeLineColor(bool cheked)
 
 void MainWindow::SetStyle()
 {
+    StyleSheet::GetStyleFromFile();
     ui->btnClose->setStyleSheet(StyleSheet::GetBlueStyleBtn());
     ui->btnAddGraph->setStyleSheet(StyleSheet::GetBlueStyleBtn());
     ui->centralwidget->setStyleSheet(StyleSheet::GetBlueStyleWidget());

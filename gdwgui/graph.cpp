@@ -174,6 +174,7 @@ void Graph::btnCloseClicked(bool checked)
 
 void Graph::SetStyle()
 {
+    StyleSheet::GetStyleFromFile();
     m_dteEnd->setStyleSheet(StyleSheet::GetBlueStyleDatePicker());
     m_dteStart->setStyleSheet(StyleSheet::GetBlueStyleDatePicker());
     m_buttonClose->setStyleSheet(StyleSheet::GetBlueStyleBtn());

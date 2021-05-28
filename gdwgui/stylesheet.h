@@ -5,6 +5,11 @@
 class StyleSheet
 {
 public:
+    static QStringList style;
+    static const QStringList styleBlue;
+    static const QStringList styleGray;
+
+public:
     StyleSheet();
     static QString GetBlueStyleBtn();
     static QString GetBlueStyleWidget();
@@ -15,7 +20,7 @@ public:
     static QString GetBlueDarkStyleWidget();
     static QString GetBlueStyleMenuBar();
     static void    SetStyleToFile(int styleNumber);
-    static int     GetStyleFromFile();
+    static void    GetStyleFromFile();
 };
 
 #endif // STYLESHEET_H
