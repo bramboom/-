@@ -35,9 +35,9 @@ void QUaConfigurationWidget::buttonUpdateClicked(bool checked)
 void QUaConfigurationWidget::SetStyle()
 {
     StyleSheet::GetStyleFromFile();
-    btnUpdate->setStyleSheet(StyleSheet::GetBlueStyleBtn());
-    dteStart->setStyleSheet(StyleSheet::GetBlueStyleDatePicker());
-    dteEnd->setStyleSheet(StyleSheet::GetBlueStyleDatePicker());
-    list->setStyleSheet(StyleSheet::GetBlueLightStyleWidget());
+    btnUpdate->setStyleSheet(StyleSheet::GetStyleBtn());
+    dteStart->setStyleSheet(StyleSheet::GetStyleDatePicker());
+    dteEnd->setStyleSheet(StyleSheet::GetStyleDatePicker());
+    list->setStyleSheet(StyleSheet::GetLightStyleWidget());
 }
 

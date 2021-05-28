@@ -243,6 +243,9 @@
      </property>
      <addaction name="actionBlue"/>
      <addaction name="actionGray"/>
+     <addaction name="actionBlue_Gray"/>
+     <addaction name="actionPink"/>
+     <addaction name="actionBrown"/>
     </widget>
     <addaction name="actionSetLineColor"/>
     <addaction name="separator"/>
@@ -281,6 +284,30 @@
    </property>
    <property name="toolTip">
     <string>2</string>
+   </property>
+  </action>
+  <action name="actionBlue_Gray">
+   <property name="text">
+    <string>Blue_Gray</string>
+   </property>
+   <property name="toolTip">
+    <string>3</string>
+   </property>
+  </action>
+  <action name="actionPink">
+   <property name="text">
+    <string>Pink</string>
+   </property>
+   <property name="toolTip">
+    <string>4</string>
+   </property>
+  </action>
+  <action name="actionBrown">
+   <property name="text">
+    <string>Brown</string>
+   </property>
+   <property name="toolTip">
+    <string>5</string>
    </property>
   </action>
  </widget>

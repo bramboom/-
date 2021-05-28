@@ -26,8 +26,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionFile,     &QAction::triggered, this, &MainWindow::inputFilePath);
     connect(ui->actionServer,   &QAction::triggered, this, &MainWindow::inputServerPath);
     connect(ui->actionSetLineColor, &QAction::triggered, this, &MainWindow::changeLineColor);
-    connect(ui->actionBlue,     &QAction::triggered, this, &MainWindow::SetBlueStyle);
-    connect(ui->actionGray,     &QAction::triggered, this, &MainWindow::SetGrayStyle);
+    connect(ui->actionBlue,      &QAction::triggered, this, &MainWindow::SetBlueStyle);
+    connect(ui->actionGray,      &QAction::triggered, this, &MainWindow::SetGrayStyle);
+    connect(ui->actionBlue_Gray, &QAction::triggered, this, &MainWindow::SetBlueGrayStyle);
+    connect(ui->actionPink,      &QAction::triggered, this, &MainWindow::SetPinkStyle);
+    connect(ui->actionBrown,     &QAction::triggered, this, &MainWindow::SetBrownStyle);
 }
 
 MainWindow::~MainWindow()
@@ -209,12 +212,12 @@ void MainWindow::changeLineColor(bool cheked)
 void MainWindow::SetStyle()
 {
     StyleSheet::GetStyleFromFile();
-    ui->btnClose->setStyleSheet(StyleSheet::GetBlueStyleBtn());
-    ui->btnAddGraph->setStyleSheet(StyleSheet::GetBlueStyleBtn());
-    ui->centralwidget->setStyleSheet(StyleSheet::GetBlueStyleWidget());
-    ui->scrollArea->setStyleSheet(StyleSheet::GetBlueStyleScrollArea());
-    widget->setStyleSheet(StyleSheet::GetBlueLightStyleWidget());
-    ui->menubar->setStyleSheet(StyleSheet::GetBlueStyleMenuBar());
+    ui->btnClose->setStyleSheet(StyleSheet::GetStyleBtn());
+    ui->btnAddGraph->setStyleSheet(StyleSheet::GetStyleBtn());
+    ui->centralwidget->setStyleSheet(StyleSheet::GetStyleWidget());
+    ui->scrollArea->setStyleSheet(StyleSheet::GetStyleScrollArea());
+    widget->setStyleSheet(StyleSheet::GetLightStyleWidget());
+    ui->menubar->setStyleSheet(StyleSheet::GetStyleMenuBar());
 }
 
 void MainWindow::SetBlueStyle(bool checked)
@@ -225,4 +228,19 @@ void MainWindow::SetBlueStyle(bool checked)
 void MainWindow::SetGrayStyle(bool checked)
 {
     StyleSheet::SetStyleToFile(2);
+}
+
+void MainWindow::SetBlueGrayStyle(bool checked)
+{
+    StyleSheet::SetStyleToFile(3);
+}
+
+void MainWindow::SetPinkStyle(bool checked)
+{
+    StyleSheet::SetStyleToFile(4);
+}
+
+void MainWindow::SetBrownStyle(bool checked)
+{
+    StyleSheet::SetStyleToFile(5);
 }

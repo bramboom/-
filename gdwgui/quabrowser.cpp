@@ -8,8 +8,7 @@ namespace EleSyOpcUaClient
     QUaBrowser::QUaBrowser(QWidget *parent)
         : QTreeWidget(parent)
     {
-        StyleSheet::GetStyleFromFile();
-        this->setStyleSheet(StyleSheet::GetBlueLightStyleWidget());
+        this->setStyleSheet(StyleSheet::GetLightStyleWidget());
         setSelectionMode(QAbstractItemView::SingleSelection);
         setDragEnabled(true);
         setDragDropMode(QAbstractItemView::DragOnly);

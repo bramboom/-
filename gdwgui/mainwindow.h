@@ -93,4 +93,7 @@ public slots:
     void changeLineColor(bool);
     void SetBlueStyle(bool);
     void SetGrayStyle(bool);
+    void SetBlueGrayStyle(bool);
+    void SetPinkStyle(bool);
+    void SetBrownStyle(bool);
 };

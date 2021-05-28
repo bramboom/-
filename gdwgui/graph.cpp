@@ -175,9 +175,9 @@ void Graph::btnCloseClicked(bool checked)
 void Graph::SetStyle()
 {
     StyleSheet::GetStyleFromFile();
-    m_dteEnd->setStyleSheet(StyleSheet::GetBlueStyleDatePicker());
-    m_dteStart->setStyleSheet(StyleSheet::GetBlueStyleDatePicker());
-    m_buttonClose->setStyleSheet(StyleSheet::GetBlueStyleBtn());
-    m_cbAlgorithm->setStyleSheet(StyleSheet::GetBlueStyleComboBox());
-    m_widget->setStyleSheet(StyleSheet::GetBlueDarkStyleWidget());
+    m_dteEnd->setStyleSheet(StyleSheet::GetStyleDatePicker());
+    m_dteStart->setStyleSheet(StyleSheet::GetStyleDatePicker());
+    m_buttonClose->setStyleSheet(StyleSheet::GetStyleBtn());
+    m_cbAlgorithm->setStyleSheet(StyleSheet::GetStyleComboBox());
+    m_widget->setStyleSheet(StyleSheet::GetDarkStyleWidget());
 }
